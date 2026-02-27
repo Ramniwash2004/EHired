@@ -2,46 +2,70 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './App.css'
 import AppLayout from './layouts/App-layout'
 import Onboarding from './pages/Onboarding'
-import Landing from "./pages/landing";
+import LandingPage from './pages/LandingPage'
 import PostJob from "./pages/PostJob";
 import JobListing from "./pages/JobListing";
 import MyJobs from "./pages/MyJobs";
 import SavedJobs from "./pages/SavedJobs";
 import JobPage from "./pages/Job";
 import { ThemeProvider } from "./components/theme-provider";
+import ProtectedRoute from './components/Protected-route'
+import { SignIn,SignUp } from "@clerk/clerk-react";
 
-const router=createBrowserRouter([
+export const router=createBrowserRouter([
   {
     element:<AppLayout/>,
     children:[
       {
         path:'/',
-        element:<Landing/>
+        element:<LandingPage/>
       },
       {
-        path:'/onboarding',
-        element:<Onboarding/>
+        path: "/onboarding",
+        element: (
+          <ProtectedRoute>
+            <Onboarding />
+          </ProtectedRoute>
+        ),
       },
       {
-        path:'/jobs',
-        element:<JobListing/>
+        path: "/jobs",
+        element: (
+          <ProtectedRoute>
+            <JobListing />
+          </ProtectedRoute>
+        ),
       },
       {
-        path:'/post-job',
-        element:<PostJob/>
+        path: "/post-job",
+        element: (
+          <ProtectedRoute>
+            <PostJob />
+          </ProtectedRoute>
+        ),
       },
       {
-        path:'/my-jobs',
-        element:<MyJobs/>
+        path: "/my-jobs",
+        element: (
+          <ProtectedRoute>
+            <MyJobs />
+          </ProtectedRoute>
+        ),
       },
       {
-        path:'/saved-jobs',
-        element:<SavedJobs/>
+        path: "/saved-jobs",
+        element: (
+          <ProtectedRoute>
+            <SavedJobs />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/job/:id",
         element: (
-          <JobPage />
+          <ProtectedRoute>
+            <JobPage />
+          </ProtectedRoute>
         ),
       },
     ],

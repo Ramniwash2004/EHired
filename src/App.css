@@ -13,6 +13,7 @@
   background-size: 50px 50px;
   pointer-events: none;
   z-index: -1;
+  opacity: 0.1;
 }
 
 .grid-background::before {
@@ -24,3 +25,7 @@
   height: 100%;
   background: radial-gradient(circle, transparent, rgba(0, 0, 0, 0.374));
 }
+/* body{
+  margin-top: 1rem;
+  margin-left: 3rem;
+} */
