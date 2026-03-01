@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { Button } from "./button";
+import { Button } from "./ui/button";
 import {
   SignedIn,
   SignedOut,

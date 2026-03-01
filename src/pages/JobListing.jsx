@@ -1,11 +1,6 @@
-import React, { useEffect } from "react";
-import { getJobs } from "@/api/apiJobs";
+import { useEffect,useState } from "react";
 import { useUser } from "@clerk/clerk-react";
-import useFetch from "@/hooks/use-fetch";
 import { BarLoader } from "react-spinners";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { State } from "country-state-city";
 import {
   Select,
   SelectContent,
@@ -14,39 +9,76 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { State } from "country-state-city";
+
+import useFetch from "@/hooks/use-fetch";
+import JobCard from "@/components/job-card";
+import { getJobs } from "@/api/apiJobs";
+import { getCompanies } from "@/api/apiCompanies";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const JobListing = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [location, setLocation] = useState("");
+  const [company_id, setCompany_id] = useState("");
+
   const { isLoaded } = useUser();
 
+  // Fetch companies using the custom useFetch hook
   const {
-    fn: fnJobs,
-    data: dataJobs,
-    loading: loadingJobs,
-  } = useFetch(getJobs, { cache: true });
+    loading: loadingCompanies,
+    data: companies,
+    fn: fnCompanies,
+  } = useFetch(getCompanies);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    
-  };
+  // Fetch jobs using the custom useFetch hook
+  const {
+    loading: loadingJobs,
+    data: jobs,
+    fn: fnJobs,
+  } = useFetch(getJobs);
+
+  useEffect(() => {
+    if (isLoaded) {
+      fnCompanies();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded]);
+
 
   useEffect(() => {
     if (isLoaded) {
       fnJobs();
     }
-  }, [isLoaded]);
+  }, [isLoaded, location, company_id, searchQuery]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    let formData = new FormData(e.target);
+
+    const query = formData.get("search-query");
+    if (query) setSearchQuery(query);
+  };
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setCompany_id("");
+    setLocation("");
+  };
 
 
-
+  //loading state while user session is being loaded
   if (!isLoaded) {
-    return <BarLoader className="mb-4" width={"100%"} color="#36d7b7" />;
+    return <BarLoader width={"100%"} color="#36d7b7" />;
   }
 
   return (
-    <div className="">
+    <div>
       <h1 className="gradient-title font-extrabold text-6xl sm:text-7xl text-center pb-8">
         Latest Jobs
       </h1>
-      <form 
+      <form
         onSubmit={handleSearch}
         className="h-14 flex flex-row w-full gap-2 items-center mb-3"
       >
@@ -56,21 +88,21 @@ const JobListing = () => {
           name="search-query"
           className="h-full flex-1  px-4 text-md"
         />
-        <Button type="submit" className="h-full sm:w-28 cursor-pointer" variant="blue">
+        <Button type="submit" className="h-full sm:w-28" variant="blue">
           Search
         </Button>
       </form>
 
-      <div className="flex flex-col sm:flex-row gap-2">
+      <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-1/2 mb-4">
         <Select value={location} onValueChange={(value) => setLocation(value)}>
           <SelectTrigger>
             <SelectValue placeholder="Filter by Location" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-gray-900 text-white border border-gray-700 shadow-lg max-h-60 overflow-y-auto scroll-smooth">
             <SelectGroup>
               {State.getStatesOfCountry("IN").map(({ name }) => {
                 return (
-                  <SelectItem key={name} value={name}>
+                  <SelectItem key={name} value={name} className="focus:bg-gray-800 focus:text-white">
                     {name}
                   </SelectItem>
                 );
@@ -78,8 +110,54 @@ const JobListing = () => {
             </SelectGroup>
           </SelectContent>
         </Select>
+
+        <Select
+          value={company_id}
+          onValueChange={(value) => setCompany_id(value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Filter by Company" />
+          </SelectTrigger>
+          <SelectContent className="bg-gray-900 text-white border border-gray-700 shadow-lg max-h-60 overflow-y-auto scroll-smooth">
+            <SelectGroup>
+              {companies?.map(({ name, id }) => {
+                return (
+                  <SelectItem key={name} value={id}>
+                    {name}
+                  </SelectItem>
+                );
+              })}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+        <Button
+          className="sm:w-1/2 cursor-pointer bg-red-700 hover:bg-red-800 text-white h-full"
+          variant="destructive"
+          onClick={clearFilters}
+        >
+          Clear Filters
+        </Button>
       </div>
-     
+
+      {loadingJobs && (
+        <BarLoader className="mt-4" width={"100%"} color="#36d7b7" />
+      )}
+
+      {!loadingJobs && (
+        <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {jobs?.length ? (
+            jobs.map((job) => (
+              <JobCard
+                key={job.id}
+                job={job}
+                savedInit={job?.saved?.length > 0}
+              />
+            ))
+          ) : (
+            <div>No Jobs Found 😢</div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

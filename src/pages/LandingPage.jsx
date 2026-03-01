@@ -49,7 +49,7 @@ const LandingPage = () => {
         <Carousel
             plugins={[
             Autoplay({
-                delay: 2000,
+                delay: 1000,
             }),
             ]}
             className="w-full py-10"
@@ -67,7 +67,7 @@ const LandingPage = () => {
             </CarouselContent>
         </Carousel>
 
-        <img src="/Hiring.webp" className="w-full h-150 py-10" />
+        <img src="/Hiring.webp" className="w-[80%] m-auto py-10 xl:h-120 lg:h-96 md:h-70 sm:h-80 rounded-full" />
 
         <section className="grid grid-cols-1 md:grid-cols-2 gap-4 py-10" >
             <Card>

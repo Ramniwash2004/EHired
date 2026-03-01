@@ -7,11 +7,9 @@ import PostJob from "./pages/PostJob";
 import JobListing from "./pages/JobListing";
 import MyJobs from "./pages/MyJobs";
 import SavedJobs from "./pages/SavedJobs";
-import JobPage from "./pages/Job";
+import JobPage from "./pages/JobPage";
 import { ThemeProvider } from "./components/theme-provider";
 import ProtectedRoute from './components/Protected-route'
-import { SignIn,SignUp } from "@clerk/clerk-react";
-
 export const router=createBrowserRouter([
   {
     element:<AppLayout/>,
@@ -64,7 +62,7 @@ export const router=createBrowserRouter([
         path: "/job/:id",
         element: (
           <ProtectedRoute>
-            <JobPage />
+            <JobPage/>
           </ProtectedRoute>
         ),
       },

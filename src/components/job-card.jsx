@@ -14,49 +14,46 @@ import useFetch from "@/hooks/use-fetch";
 import { useUser } from "@clerk/clerk-react";
 import { useEffect, useState } from "react";
 import { BarLoader } from "react-spinners";
+import { saveJob } from "@/api/apiJobs";
 
-const JobCard = ({
-  job,
-  savedInit = false,
-  onJobAction = () => {},
-  isMyJob = false,
-}) => {
+const JobCard = ({job,savedInit = false,onJobAction = () => {},isMyJob=false,}) => {
+
   const [saved, setSaved] = useState(savedInit);
 
   const { user } = useUser();
 
-//   const { loading: loadingDeleteJob, fn: fnDeleteJob } = useFetch(deleteJob, {
-//     job_id: job.id,
-//   });
+  // const { loading: loadingDeleteJob, fn: fnDeleteJob } = useFetch(deleteJob, {
+  //   job_id: job.id,
+  // });
 
-//   const {
-//     loading: loadingSavedJob,
-//     data: savedJob,
-//     fn: fnSavedJob,
-//   } = useFetch(saveJob);
+  // const {
+  //   loading: loadingSavedJob,
+  //   data: savedJob,
+  //   fn: fnSavedJob,
+  // } = useFetch(saveJob);
 
-  const handleSaveJob = async () => {
-    await fnSavedJob({
-      user_id: user.id,
-      job_id: job.id,
-    });
-    onJobAction();
-  };
+  // const handleSaveJob = async () => {
+  //   await fnSavedJob({
+  //     user_id: user.id, 
+  //     job_id: job.id,
+  //   });
+  //   onJobAction();
+  // };
 
-  const handleDeleteJob = async () => {
-    await fnDeleteJob();
-    onJobAction();
-  };
+  // const handleDeleteJob = async () => {
+  //   await fnDeleteJob();
+  //   onJobAction();
+  // };
 
-//   useEffect(() => {
-//     if (savedJob !== undefined) setSaved(savedJob?.length > 0);
-//   }, [savedJob]);
+  // useEffect(() => {
+  //   if (savedJob !== undefined) setSaved(savedJob?.length > 0);
+  // }, [savedJob]);
 
   return (
     <Card className="flex flex-col">
-      {loadingDeleteJob && (
+      {/* {loadingDeleteJob && (
         <BarLoader className="mt-4" width={"100%"} color="#36d7b7" />
-      )}
+      )} */}
       <CardHeader className="flex">
         <CardTitle className="flex justify-between font-bold">
           {job.title}
@@ -65,7 +62,7 @@ const JobCard = ({
               fill="red"
               size={18}
               className="text-red-300 cursor-pointer"
-              onClick={handleDeleteJob}
+              // onClick={handleDeleteJob}
             />
           )}
         </CardTitle>
@@ -78,10 +75,10 @@ const JobCard = ({
           </div>
         </div>
         <hr />
-        {job.description.substring(0, job.description.indexOf("."))}.
+        {job.description}.
       </CardContent>
       <CardFooter className="flex gap-2">
-        <Link to={`/job/${job.id}`} className="flex-1">
+        <Link to={`/job/${job.id}`} className="flex-1"> 
           <Button variant="secondary" className="w-full">
             More Details
           </Button>
@@ -90,8 +87,8 @@ const JobCard = ({
           <Button
             variant="outline"
             className="w-15"
-            onClick={handleSaveJob}
-            disabled={loadingSavedJob}
+            // onClick={handleSaveJob}
+            // disabled={loadingSavedJob}
           >
             {saved ? (
               <Heart size={20} fill="red" stroke="red" />
