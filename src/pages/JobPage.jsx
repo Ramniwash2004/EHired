@@ -1,7 +1,21 @@
 import { useUser } from '@clerk/clerk-react';
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom';
+import useFetch from '@/hooks/use-fetch';
 import { BarLoader } from 'react-spinners';
+import { getSingleJob, updateHiringStatus } from '../api/apiJobs';
+import { Briefcase, DoorClosed, DoorOpen, MapPinIcon } from "lucide-react";
+import MDEditor from "@uiw/react-md-editor";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ApplyJobDrawer } from "../components/apply-job";
+import ApplicationCard from "../components/application-card";
+
 
 const JobPage = () => {
   const { id } = useParams();
@@ -17,8 +31,27 @@ const JobPage = () => {
   });
 
   useEffect(() => {
-    if (isLoaded) fnJob();
-  }, [isLoaded]);
+    if (isLoaded){
+      fnJob();
+    }
+  }, [isLoaded, id]);
+
+  const { loading: loadingHiringStatus, fn: fnHiringStatus } = useFetch(
+    updateHiringStatus,
+    {
+      job_id: id,
+    }
+  );
+
+
+  const handleStatusChange = (value) => {
+  const isOpen = value === "open";
+
+    fnHiringStatus({
+      job_id: id,
+      isOpen,
+    }).then(() => fnJob());
+  };
 
   if (!isLoaded || loadingJob) {
     return <BarLoader className="mb-4" width={"100%"} color="#36d7b7" />;
@@ -32,7 +65,78 @@ const JobPage = () => {
         </h1>
         <img src={job?.company?.logo_url} className="h-12" alt={job?.title} />
       </div>
-    </div>
+
+      <div className="flex justify-between ">
+        <div className="flex gap-2">
+          <MapPinIcon /> {job?.location}
+        </div>
+        <div className="flex gap-2">
+          <Briefcase /> {job?.applications?.length} Applicants
+        </div>
+        <div className="flex gap-2">
+          {job?.isOpen ? (
+            <>
+              <DoorOpen /> Open
+            </>
+          ) : (
+            <>
+              <DoorClosed /> Closed
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* hiring startus */}
+      {job?.recruiter_id === user?.id && (
+        <Select value={job?.isOpen ? "open" : "closed"} onValueChange={handleStatusChange}>
+          <SelectTrigger
+            className={`w-full ${job?.isOpen ? "bg-green-950" : "bg-red-950"}`}
+          >
+            <SelectValue
+              placeholder={
+                "Hiring Status " + (job?.isOpen ? "( Open )" : "( Closed )")
+              }
+            />
+          </SelectTrigger>
+          <SelectContent className="bg-gray-900 text-white border border-gray-700 shadow-lg max-h-60 overflow-y-auto scroll-smooth">
+            <SelectItem value="open">Open</SelectItem>
+            <SelectItem value="closed">Closed</SelectItem>
+          </SelectContent>
+        </Select>
+      )}
+
+      <h2 className="text-2xl sm:text-3xl font-bold">About the job</h2>
+      <p className="sm:text-lg">{job?.description}</p>
+
+      <h2 className="text-2xl sm:text-3xl font-bold">
+        What we are looking for
+      </h2>
+      <MDEditor.Markdown
+        source={job?.requirements}
+        className="bg-transparent sm:text-lg" // add global ul styles - tutorial
+      />
+
+      {/* render applications component here */}
+      {job?.recruiter_id !== user?.id && (
+        <ApplyJobDrawer
+          job={job}
+          user={user}
+          fetchJob={fnJob}
+          applied={job?.applications?.find((ap) => ap.candidate_id === user.id)} //if user already applied then pass true
+        />
+      )}
+      {loadingHiringStatus && <BarLoader width={"100%"} color="#36d7b7" />}
+       {job?.applications?.length > 0 && job?.recruiter_id === user?.id && (
+        <div className="flex flex-col gap-2">
+          <h2 className="font-bold mb-4 text-xl ml-1">Applications</h2>
+          {job?.applications.map((application) => {
+            return (
+              <ApplicationCard key={application.id} application={application} />
+            );
+          })}
+        </div>
+      )}
+    </div> 
   )
 }
 
