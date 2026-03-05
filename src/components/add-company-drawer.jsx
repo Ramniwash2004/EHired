@@ -31,7 +31,7 @@ const schema = z.object({
     ),
 });
 
-export const AddCompanyDrawer = () => {
+export const AddCompanyDrawer = ({ fetchCompanies }) => {
 
   const {
     register,
@@ -62,12 +62,16 @@ export const AddCompanyDrawer = () => {
 
   return (
     <Drawer>
-      <DrawerTrigger>
-        <Button type="button" size="sm" className='bg-amber-50 text-black cursor-pointer'>
+      <DrawerTrigger asChild>
+        <Button
+          type="button"
+          size="sm"
+          className="bg-amber-50 text-black cursor-pointer"
+        >
           Add Company
         </Button>
       </DrawerTrigger>
-      <DrawerContent className='bg-black'>
+      <DrawerContent className="bg-black">
         <DrawerHeader>
           <DrawerTitle>Add a New Company</DrawerTitle>
         </DrawerHeader>
@@ -80,7 +84,7 @@ export const AddCompanyDrawer = () => {
             type="file"
             accept="image/*"
             className=" file:text-gray-500"
-            {...register("logo")}
+            {...register("logo")} //change the logo and other as it is
           />
 
           {/* Add Button */}
@@ -107,6 +111,6 @@ export const AddCompanyDrawer = () => {
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
-  )
+  );
 }
 export default AddCompanyDrawer

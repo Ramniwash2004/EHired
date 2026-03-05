@@ -29,6 +29,22 @@ export async function getJobs(token) {
   return data;
 }
 
+
+// Read Saved Jobs
+export async function getSavedJobs(token) {
+  const supabase = await supabaseClient(token);
+  const { data, error } = await supabase
+    .from("saved_jobs")
+    .select("*, job: jobs(*, company: companies(name,logo_url))");
+
+  if (error) {
+    console.error("Error fetching Saved Jobs:", error);
+    return null;
+  }
+
+  return data;
+}
+
 // Read single job
 export async function getSingleJob(token, { job_id }) {
   const supabase = await supabaseClient(token);
@@ -99,6 +115,44 @@ export async function updateHiringStatus(token,{ job_id },{ isOpen }) {
 
   return data;
 }
+
+
+// get my created jobs
+export async function getMyJobs(token, { recruiter_id }) {
+  const supabase = await supabaseClient(token);
+
+  const { data, error } = await supabase
+    .from("jobs")
+    .select("*, company: companies(name,logo_url)")
+    .eq("recruiter_id", recruiter_id);
+
+  if (error) {
+    console.error("Error fetching Jobs:", error);
+    return null;
+  }
+
+  return data;
+}
+
+// Delete job from recruiter
+export async function deleteJob(token,{ job_id}) {
+  const supabase = await supabaseClient(token);
+
+  const { data, error: deleteError } = await supabase
+    .from("jobs")
+    .delete()
+    .eq("id", job_id)
+    .select();
+
+  if (deleteError) {
+    console.error("Error deleting job:", deleteError);
+    return data;
+  }
+
+  return data;
+}
+
+
 
 // - post job
 export async function addNewJob(token, _, jobData) {
